@@ -14,13 +14,13 @@ function VisualShell({title,aside,children,dark=false}) {
 
 const flowSteps = ['Texto','Tokenizer','Tokens','Modelo','Logits','Muestreo','Tokens nuevos','Texto'];
 function FlowVisual() {
-  return <VisualShell title="La misma pregunta, dos maneras de ejecutarla" aside="Es un ejemplo de inferencia: los pesos se usan para responder, no se modifican. Ninguna ruta representa una llamada real." dark>
+  return <VisualShell title="¿Quién pone el modelo y la GPU?" aside="Ejemplo didáctico. Los pesos se usan para responder; no se modifican. No se conecta a ningún proveedor." dark>
     <div className="flow-prompt"><span>PREGUNTA DE EJEMPLO</span><strong>«¿Por qué aparece CUDA out of memory?»</strong></div>
     <div className="flow-routes" aria-label="Comparación entre API y pesos propios">
-      <div className="flow-route"><span className="flow-route-number">01</span><div><h3>API de un proveedor</h3><p>Envías el mensaje a un endpoint. El proveedor carga el modelo, usa su GPU y te devuelve la respuesta.</p></div><strong>Controlas la petición</strong></div>
-      <div className="flow-route"><span className="flow-route-number">02</span><div><h3>Pesos en tu infraestructura</h3><p>Descargas el checkpoint, eliges runtime y GPU, y te ocupas de memoria, versiones y servicio.</p></div><strong>Controlas la ejecución</strong></div>
+      <div className="flow-route"><span className="flow-route-number">01</span><div><h3>API de un proveedor</h3><p>Tú envías la pregunta. El proveedor pone el modelo y la GPU y te devuelve la respuesta.</p></div><strong>El proveedor mantiene el modelo</strong></div>
+      <div className="flow-route"><span className="flow-route-number">02</span><div><h3>Pesos en tu infraestructura</h3><p>Descargas el modelo y eliges el runtime y la GPU. También gestionas la memoria, las versiones y el servicio.</p></div><strong>Tú mantienes la ejecución</strong></div>
     </div>
-    <div className="flow-engine"><div className="flow-engine-heading"><span>EN LOS DOS CASOS</span><strong>El modelo genera un token cada vez</strong></div><ol className="flow-steps">{flowSteps.map((name,i)=><li key={`${name}-${i}`} style={{'--step':i}}><small>{String(i+1).padStart(2,'0')}</small><span>{name}</span></li>)}</ol><div className="flow-output"><span>RESPUESTA ILUSTRATIVA</span><strong>«La GPU no tiene memoria disponible para esta carga.»</strong></div></div>
+    <div className="flow-engine"><div className="flow-engine-heading"><span>EL PROCESO</span><strong>El modelo genera un token cada vez</strong></div><ol className="flow-steps">{flowSteps.map((name,i)=><li key={`${name}-${i}`} style={{'--step':i}}><small>{String(i+1).padStart(2,'0')}</small><span>{name}</span></li>)}</ol><div className="flow-output"><span>RESPUESTA DE EJEMPLO</span><strong>«La GPU no tiene memoria disponible para esta carga.»</strong></div></div>
   </VisualShell>;
 }
 
@@ -33,14 +33,14 @@ function ArchitectureVisual() {
   </VisualShell>;
 }
 
-const formats={gguf:{name:'GGUF',kind:'Formato',text:'Archivo y metadatos para modelos, frecuente con llama.cpp. Comprueba la cuantización concreta del archivo.'},awq:{name:'AWQ',kind:'Método',text:'Cuantización posentrenamiento que tiene en cuenta activaciones. El soporte depende del motor y del checkpoint.'},gptq:{name:'GPTQ',kind:'Método',text:'Otra familia de cuantización posentrenamiento. No equivale a un formato universal.'},fp8:{name:'FP8',kind:'Representación',text:'Coma flotante de ocho bits. Necesita soporte de hardware y kernels para el caso concreto.'}};
+const formats={gguf:{name:'GGUF',kind:'Formato',text:'Archivo y metadatos para modelos, frecuente con llama.cpp. Comprueba la cuantización concreta del archivo.'},awq:{name:'AWQ',kind:'Método',text:'Cuantización posentrenamiento que tiene en cuenta activaciones. El soporte depende del motor y del checkpoint.'},gptq:{name:'GPTQ',kind:'Método',text:'Método de cuantización posentrenamiento. Comprueba qué checkpoints y runtimes lo admiten.'},fp8:{name:'FP8',kind:'Representación',text:'Coma flotante de ocho bits. Necesita soporte de hardware y kernels para el caso concreto.'}};
 function PrecisionVisual() {
   const [size,setSize]=useState(8);
   const bytes={'FP32':4,'FP16/BF16':2,'FP8/INT8':1,'INT4':0.5};
   return <VisualShell title="Cuánto ocupan los pesos" aside="Cifras ideales: faltan escalas, metadatos, tensores sin cuantizar y runtime. Menos bits no garantizan más velocidad.">
     <div className="visual-controls"><div><span className="control-label">TAMAÑO DEL MODELO</span><Choice label="Tamaño de modelo" options={[{value:8,label:'8B'},{value:14,label:'14B'}]} value={size} onChange={setSize}/></div></div>
     <div className="precision-bars">{Object.entries(bytes).map(([name,value])=><div className="precision-bar" key={name}><strong>{name}</strong><div><span style={{width:`${value/4*100}%`}}/></div><small>{value.toLocaleString('es-ES')} B/parámetro</small><b>≈{(size*value).toLocaleString('es-ES')} GB</b></div>)}</div>
-    <div className="format-catalog"><span className="control-label">NO SON LA MISMA CLASE DE ETIQUETA</span><div>{Object.values(formats).map(item=><article key={item.name}><strong>{item.name}</strong><small>{item.kind}</small><p>{item.text}</p></article>)}</div></div>
+    <div className="format-catalog"><span className="control-label">CADA NOMBRE DESCRIBE ALGO DISTINTO</span><div>{Object.values(formats).map(item=><article key={item.name}><strong>{item.name}</strong><small>{item.kind}</small><p>{item.text}</p></article>)}</div></div>
   </VisualShell>;
 }
 
@@ -63,7 +63,7 @@ const decisionSteps=[
 ];
 function DecisionVisual() {
   const [caseId,setCaseId]=useState('soporte');
-  return <VisualShell title="Del caso de uso al checkpoint">
+  return <VisualShell title="¿Qué modelo sirve para esta tarea?">
     <div className="visual-controls"><div><span className="control-label">CASO DE TRABAJO</span><Choice label="Caso de uso" options={[{value:'soporte',label:'Soporte en castellano'},{value:'codigo',label:'Ayuda con código'}]} value={caseId} onChange={setCaseId}/></div></div>
     <div className="decision-layout"><div className="decision-situation"><small>NECESIDAD</small><p>{caseId==='soporte'?'Responder en castellano con documentos de 3.000 tokens y citas comprobables.':'Explicar cambios en un repositorio y proponer código con ejemplos reales.'}</p></div><ol className="decision-checks">{decisionSteps.map((item,i)=><li key={item.name}><span>{String(i+1).padStart(2,'0')}</span><div><strong>{item.name}</strong><p>{item.detail}</p></div></li>)}</ol></div>
   </VisualShell>;
@@ -71,24 +71,24 @@ function DecisionVisual() {
 
 const requests=[{id:'A',start:1,end:3},{id:'B',start:2,end:4},{id:'C',start:3,end:5}];
 function ServingVisual() {
-  return <VisualShell title="Un lote que cambia en cada iteración" dark aside="El dibujo explica el mecanismo. No representa tiempos ni rendimiento medidos.">
+  return <VisualShell title="Así comparten la GPU varias peticiones" dark aside="El dibujo explica el mecanismo. No representa tiempos ni rendimiento medidos.">
     <div className="serving-path">{['Cliente','API','Planificador','Motor + GPU'].map((part,i)=><React.Fragment key={part}><span>{part}</span>{i<3&&<b aria-hidden="true">→</b>}</React.Fragment>)}</div>
     <div className="batch-interaction"><div className="batch-top"><div><small>LOTE CONTINUO</small><strong>Las peticiones entran y salen en distintas iteraciones</strong></div></div><div className="batch-grid"><div className="batch-times"><span></span>{[1,2,3,4,5].map(n=><span key={n}>t{n}</span>)}</div>{requests.map(req=><div className="batch-line" key={req.id}><strong>{req.id}</strong>{[1,2,3,4,5].map(n=><span className={n>=req.start&&n<=req.end?'occupied':''} key={n}>{n>=req.start&&n<=req.end?'●':''}</span>)}</div>)}</div><p>B entra mientras A sigue generando. A termina y deja sitio antes de que C acabe.</p></div>
   </VisualShell>;
 }
 
 const metrics={
-  TTFT:{name:'Tiempo hasta el primer token',text:'Desde que sale la petición hasta que aparece el primer token. Incluye la espera en cola y el trabajo inicial.'},
-  ITL:{name:'Intervalo entre tokens',text:'El tiempo que separa un token generado del siguiente. Un ritmo irregular se nota al leer una respuesta en streaming.'},
+  TTFT:{name:'Tiempo hasta el primer token',text:'Tiempo entre el envío de la petición y el primer token. Incluye la cola y el trabajo inicial.'},
+  ITL:{name:'Intervalo entre tokens',text:'Tiempo entre un token y el siguiente. Si cambia mucho, el ritmo de la respuesta se vuelve irregular.'},
   TPOT:{name:'Tiempo medio por token',text:'Promedio por token de salida después del primero, cuando la herramienta utiliza esa definición.'},
-  total:{name:'Latencia completa',text:'Desde el envío hasta el último token. Depende también de cuántos tokens tiene la respuesta.'},
-  sistema:{name:'Trabajo del sistema',text:'Tokens de salida/s y peticiones terminadas/s miden trabajo agregado. Mira cola, concurrencia y errores al lado.'},
+  total:{name:'Latencia completa',text:'Tiempo que tarda la petición en completarse. También depende de la longitud de la respuesta.'},
+  sistema:{name:'Trabajo del sistema',text:'Tokens de salida/s y peticiones terminadas/s muestran cuánto trabajo acaba el servicio. Mide también cola, concurrencia y errores.'},
 };
 function MetricsVisual() {
   const [metric,setMetric]=useState('TTFT'),[load,setLoad]=useState(1);
   return <VisualShell title="La espera de una petición" aside="Las pruebas con 1, 10 y 50 peticiones son ejemplos, no cifras de capacidad.">
     <Choice label="Métrica" options={Object.entries(metrics).map(([value,item])=>({value,label:value==='total'?'Total':value==='sistema'?'Sistema':item.name.split(' ')[0]}))} value={metric} onChange={setMetric}/>
-    <div className="metric-scene"><div className="metric-track"><span className="metric-request">Petición</span><span className={'metric-wait'+(metric==='TTFT'?' highlighted':'')}>Cola + entrada</span><span className={'metric-first'+(['TTFT','total'].includes(metric)?' highlighted':'')}>1.º token</span><span className={'metric-stream'+(['ITL','TPOT','total'].includes(metric)?' highlighted':'')}>▮　▮　▮　▮</span><span className="metric-end">Fin</span></div><div className="metric-description" aria-live="polite"><small>{metric==='sistema'?'VISIÓN DE SISTEMA':'VISIÓN DE LA PETICIÓN'}</small><h3>{metrics[metric].name}</h3><p>{metrics[metric].text}</p></div></div>
+    <div className="metric-scene"><div className="metric-track"><span className="metric-request">Petición</span><span className={'metric-wait'+(metric==='TTFT'?' highlighted':'')}>Cola + entrada</span><span className={'metric-first'+(['TTFT','total'].includes(metric)?' highlighted':'')}>1.º token</span><span className={'metric-stream'+(['ITL','TPOT','total'].includes(metric)?' highlighted':'')}>▮　▮　▮　▮</span><span className="metric-end">Fin</span></div><div className="metric-description" aria-live="polite"><small>{metric==='sistema'?'MÉTRICAS DEL SERVICIO':'MÉTRICAS DE UNA PETICIÓN'}</small><h3>{metrics[metric].name}</h3><p>{metrics[metric].text}</p></div></div>
     <div className="test-points"><span>Probar con</span><Choice label="Concurrencia de prueba" options={[1,10,50].map(n=>({value:n,label:`${n} ${n===1?'petición':'peticiones'}`}))} value={load} onChange={setLoad}/><small>{load===50?'Busca el punto donde la cola o los errores rompen el objetivo.':'Mantén iguales el modelo, la GPU, los prompts, las salidas y el muestreo.'}</small></div>
   </VisualShell>;
 }
@@ -102,7 +102,7 @@ function TuningVisual() {
   ];
   return <VisualShell title="Qué cambia al ajustar vLLM" aside="Los ajustes disponibles dependen de la versión de vLLM, el modelo, la GPU y la carga.">
     <div className="tuning-overview">{groups.map((group,i)=><div className="tuning-lane" key={group.number} style={{'--step':i}}><div><span>{group.number}</span><h3>{group.name}</h3></div><code>{group.keys}</code><p>{group.text}</p><strong>{group.measure}</strong></div>)}</div>
-    <div className="tuning-baseline"><span>ANTES Y DESPUÉS, CON LA MISMA CARGA</span><strong>TTFT · throughput · errores · VRAM</strong></div>
+    <div className="tuning-baseline"><span>REPITE LA MISMA CARGA</span><strong>TTFT · throughput · errores · VRAM</strong></div>
   </VisualShell>;
 }
 

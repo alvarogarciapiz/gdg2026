@@ -20,7 +20,7 @@ npm run preview
 
 El mapa permite acercar, alejar y arrastrar. Las flechas del teclado eligen una sección; Intro la abre, `+` y `-` cambian el zoom y `0` ajusta el mapa. También hay una lista de secciones. En móvil, la lista es la vista inicial y se puede abrir el mapa visual.
 
-Cada sección muestra su idea y un esquema desde el primer vistazo. Algunas cifras y ejemplos se pueden cambiar, pero los conceptos principales se entienden sin tocar controles. El modo presentación usa las flechas izquierda y derecha para cambiar de sección; Escape vuelve al mapa. Las URL `#/seccion/01` a `#/seccion/11` abren cada sección directamente. Las secciones visitadas se recuerdan durante la sesión del navegador.
+Al abrir una sección aparece su diagrama principal y una explicación breve. Puedes cambiar algunas cifras y ejemplos con los controles. En modo presentación, usa las flechas para avanzar y Escape para volver al mapa. Las URL `#/seccion/01` a `#/seccion/11` abren cada sección; las visitas se recuerdan durante la sesión.
 
 El contenido se edita en `src/workshopData.js`. Los esquemas interactivos están en `src/Visuals.jsx`. Los notebooks aparecen como llamadas a la práctica; este proyecto no los implementa.
 
