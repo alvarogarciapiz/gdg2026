@@ -6,8 +6,8 @@ function Choice({options,value,onChange,label}) {
 function Slider({label,value,onChange,min,max,step=1,suffix=''}) {
   return <label className="slider-field"><span>{label}<strong>{Number(value).toLocaleString('es-ES')}{suffix}</strong></span><input type="range" min={min} max={max} step={step} value={value} onChange={e=>onChange(Number(e.target.value))}/></label>;
 }
-function VisualShell({eyebrow,title,aside,children,dark=false}) {
-  return <section className={'interactive-visual'+(dark?' visual-dark':'')} aria-label={title}><div className="visual-head"><div><span className="visual-eyebrow">EXPLORA EL CONCEPTO</span><h2>{title}</h2></div><span className="visual-live">↔ Puedes cambiarlo</span></div>{children}{aside&&<p className="visual-disclaimer">{aside}</p>}</section>;
+function VisualShell({title,aside,children,dark=false}) {
+  return <section className={'interactive-visual'+(dark?' visual-dark':'')} aria-label={title}><div className="visual-head"><div><span className="visual-eyebrow">EN UNA IMAGEN</span><h2>{title}</h2></div></div>{children}{aside&&<p className="visual-disclaimer">{aside}</p>}</section>;
 }
 
 const flowSteps = [
@@ -21,10 +21,10 @@ const flowSteps = [
   {name:'Texto',detail:'El tokenizer decodifica los tokens generados para mostrarlos.'},
 ];
 function FlowVisual() {
-  const [step,setStep]=useState(0),[mode,setMode]=useState('pesos');
+  const [step,setStep]=useState(null),[mode,setMode]=useState('pesos');
   return <VisualShell title="Sigue un token" aside="El esquema muestra una generación, no un entrenamiento." dark>
     <Choice label="Dónde se ejecuta" options={[{value:'pesos',label:'Pesos cargados aquí'},{value:'api',label:'API de proveedor'}]} value={mode} onChange={setMode}/>
-    <div className="flow-surface"><div className="flow-steps">{flowSteps.map((item,i)=><button type="button" key={i} aria-pressed={step===i} onClick={()=>setStep(i)}><span>{String(i+1).padStart(2,'0')}</span>{item.name}</button>)}</div><div className="flow-detail" aria-live="polite"><span>PASO {String(step+1).padStart(2,'0')}</span><strong>{flowSteps[step].name}</strong><p>{flowSteps[step].detail}</p></div></div>
+    <div className="flow-surface"><div className="flow-steps">{flowSteps.map((item,i)=><button type="button" key={i} aria-pressed={step===i} onClick={()=>setStep(i)}><span>{String(i+1).padStart(2,'0')}</span>{item.name}</button>)}</div><div className="flow-detail" aria-live="polite">{step===null?<><span>EL RECORRIDO</span><strong>Del texto al texto</strong><p>El modelo puntúa el siguiente token, se elige uno y el ciclo continúa. Puedes abrir cualquier paso para verlo mejor.</p></>:<><span>PASO {String(step+1).padStart(2,'0')}</span><strong>{flowSteps[step].name}</strong><p>{flowSteps[step].detail}</p></>}</div></div>
     <p className="visual-under">{mode==='api'?'La secuencia ocurre en la infraestructura del proveedor. Tú envías la petición y recibes la respuesta.':'El proceso y los pesos están en la infraestructura que tú operas.'}</p>
   </VisualShell>;
 }
@@ -40,12 +40,12 @@ function ArchitectureVisual() {
 
 const formats={gguf:{name:'GGUF',kind:'Formato',text:'Archivo y metadatos para modelos, frecuente con llama.cpp. Comprueba la cuantización concreta del archivo.'},awq:{name:'AWQ',kind:'Método',text:'Cuantización posentrenamiento que tiene en cuenta activaciones. El soporte depende del motor y del checkpoint.'},gptq:{name:'GPTQ',kind:'Método',text:'Otra familia de cuantización posentrenamiento. No equivale a un formato universal.'},fp8:{name:'FP8',kind:'Representación',text:'Coma flotante de ocho bits. Necesita soporte de hardware y kernels para el caso concreto.'}};
 function PrecisionVisual() {
-  const [precision,setPrecision]=useState('FP16/BF16'),[size,setSize]=useState(8),[format,setFormat]=useState('gguf');
+  const [size,setSize]=useState(8);
   const bytes={'FP32':4,'FP16/BF16':2,'FP8/INT8':1,'INT4':0.5};
-  return <VisualShell title="Mueve los bits; conserva las cautelas" aside="La cuenta usa bytes ideales por parámetro. Faltan escalas, metadatos, tensores sin cuantizar y runtime.">
-    <div className="visual-controls"><div><span className="control-label">VARIANTE</span><Choice label="Precisión" options={Object.keys(bytes).map(v=>({value:v,label:v}))} value={precision} onChange={setPrecision}/></div><div><span className="control-label">TAMAÑO</span><Choice label="Tamaño de modelo" options={[{value:8,label:'8B'},{value:14,label:'14B'}]} value={size} onChange={setSize}/></div></div>
-    <div className="precision-result"><div><small>POR PARÁMETRO</small><strong>{bytes[precision].toLocaleString('es-ES')} bytes</strong></div><span>×</span><div><small>PESOS IDEALES</small><strong>≈{(size*bytes[precision]).toLocaleString('es-ES')} GB</strong></div></div>
-    <div className="format-explorer"><span className="control-label">¿QUÉ NOMBRA CADA ETIQUETA?</span><div className="format-row"><Choice label="Formatos y métodos" options={Object.entries(formats).map(([value,item])=>({value,label:item.name}))} value={format} onChange={setFormat}/><div className="format-explanation" aria-live="polite"><small>{formats[format].kind}</small><p>{formats[format].text}</p></div></div></div>
+  return <VisualShell title="Los bits cambian el tamaño ideal" aside="Cuenta ideal de pesos. Faltan escalas, metadatos, tensores sin cuantizar y memoria del runtime. Menos bits no garantizan más velocidad.">
+    <div className="visual-controls"><div><span className="control-label">TAMAÑO DEL MODELO</span><Choice label="Tamaño de modelo" options={[{value:8,label:'8B'},{value:14,label:'14B'}]} value={size} onChange={setSize}/></div></div>
+    <div className="precision-bars">{Object.entries(bytes).map(([name,value])=><div className="precision-bar" key={name}><strong>{name}</strong><div><span style={{width:`${value/4*100}%`}}/></div><small>{value.toLocaleString('es-ES')} B/parámetro</small><b>≈{(size*value).toLocaleString('es-ES')} GB</b></div>)}</div>
+    <div className="format-catalog"><span className="control-label">NO SON LA MISMA CLASE DE ETIQUETA</span><div>{Object.values(formats).map(item=><article key={item.name}><strong>{item.name}</strong><small>{item.kind}</small><p>{item.text}</p></article>)}</div></div>
   </VisualShell>;
 }
 
@@ -57,6 +57,7 @@ function MemoryVisual() {
     <div className="memory-controls sliders"><Slider label="Tokens residentes por secuencia" value={tokens} onChange={setTokens} min={1024} max={8192} step={1024}/><Slider label="Secuencias iguales" value={seqs} onChange={setSeqs} min={1} max={8}/></div>
     <div className="memory-outcome"><div><small>PESOS IDEALES</small><strong>≈{weights.toLocaleString('es-ES')} GB</strong></div><span>+</span><div><small>KV ILUSTRATIVA</small><strong>≈{kvMiB>=1024?(kvMiB/1024).toLocaleString('es-ES',{maximumFractionDigits:2})+' GiB':kvMiB.toLocaleString('es-ES')+' MiB'}</strong></div><span className="memory-not-total">≠ VRAM total</span></div>
     <div className="formula-strip">KV bytes ≈ 2 × capas × cabezas KV × dimensión × bytes × tokens residentes</div>
+    <p className="visual-under">Con 4.096 tokens: ≈512 MiB para una secuencia; ≈4 GiB para ocho iguales en este ejemplo.</p>
   </VisualShell>;
 }
 
@@ -70,21 +71,19 @@ const decisionChecks=[
   'Prueba propia frente a otro candidato',
 ];
 function DecisionVisual() {
-  const [checked,setChecked]=useState([]),[caseId,setCaseId]=useState('soporte');
-  const toggle=i=>setChecked(old=>old.includes(i)?old.filter(x=>x!==i):[...old,i]);
+  const [caseId,setCaseId]=useState('soporte');
   return <VisualShell title="Construye una decisión defendible" aside="La lista no elige un modelo por ti. Indica qué falta comprobar antes de probar un candidato.">
     <div className="visual-controls"><div><span className="control-label">CASO DE TRABAJO</span><Choice label="Caso de uso" options={[{value:'soporte',label:'Soporte en castellano'},{value:'codigo',label:'Ayuda con código'}]} value={caseId} onChange={setCaseId}/></div></div>
-    <div className="decision-layout"><div className="decision-situation"><small>NECESIDAD</small><p>{caseId==='soporte'?'Responder preguntas en castellano con documentos largos y citas comprobables.':'Explicar cambios en un repositorio y proponer código, con ejemplos reales del equipo.'}</p><strong>{checked.length} / {decisionChecks.length} comprobaciones</strong><div className="decision-progress"><span style={{width:`${checked.length/decisionChecks.length*100}%`}}/></div></div><div className="decision-checks">{decisionChecks.map((item,i)=><label key={item}><input type="checkbox" checked={checked.includes(i)} onChange={()=>toggle(i)}/><span>{item}</span></label>)}</div></div>
-    <p className="visual-under" aria-live="polite">{checked.length===decisionChecks.length?'Ya tienes una hipótesis comprobable. Ahora compárala con otro candidato usando las mismas entradas.':'Marca lo que ya has verificado. Lo que queda sin marcar es trabajo pendiente, no un aprobado implícito.'}</p>
+    <div className="decision-layout"><div className="decision-situation"><small>NECESIDAD</small><p>{caseId==='soporte'?'Responder en castellano con documentos largos y citas comprobables.':'Explicar cambios en un repositorio y proponer código con ejemplos reales.'}</p><strong>Empieza aquí. Luego descarta con datos.</strong></div><ol className="decision-checks">{decisionChecks.map((item,i)=><li key={item}><span>{String(i+1).padStart(2,'0')}</span>{item}</li>)}</ol></div>
+    <p className="visual-under">La prueba con tus propios ejemplos decide. Anota también por qué queda fuera el otro candidato.</p>
   </VisualShell>;
 }
 
 const requests=[{id:'A',start:1,end:3},{id:'B',start:2,end:4},{id:'C',start:3,end:5}];
 function ServingVisual() {
-  const [iteration,setIteration]=useState(1);
   return <VisualShell title="Deja entrar otra petición" dark aside="Secuencia conceptual. Las duraciones y el rendimiento reales dependen de la carga y la configuración.">
     <div className="serving-path">{['Cliente','API','Scheduler','Motor + GPU'].map((part,i)=><React.Fragment key={part}><span>{part}</span>{i<3&&<b aria-hidden="true">→</b>}</React.Fragment>)}</div>
-    <div className="batch-interaction"><div className="batch-top"><div><small>LOTE CONTINUO</small><strong>Iteración {iteration} / 5</strong></div><div><button onClick={()=>setIteration(i=>Math.max(1,i-1))} disabled={iteration===1}>Anterior</button><button onClick={()=>setIteration(i=>Math.min(5,i+1))} disabled={iteration===5}>Siguiente →</button></div></div><div className="batch-grid"><div className="batch-times"><span></span>{[1,2,3,4,5].map(n=><span className={n===iteration?'active':''} key={n}>t{n}</span>)}</div>{requests.map(req=><div className="batch-line" key={req.id}><strong>{req.id}</strong>{[1,2,3,4,5].map(n=><span className={`${n>=req.start&&n<=req.end?'occupied ':''}${n===iteration?'now ':''}`} key={n}>{n<=iteration&&n>=req.start&&n<=req.end?'●':''}</span>)}</div>)}</div><p aria-live="polite">{requests.filter(r=>iteration>=r.start&&iteration<=r.end).map(r=>r.id).join(', ')} {iteration===1?'está activa. B todavía no ha llegado.':'están activas en esta iteración.'}</p></div>
+    <div className="batch-interaction"><div className="batch-top"><div><small>LOTE CONTINUO</small><strong>Las peticiones entran y salen en distintas iteraciones</strong></div></div><div className="batch-grid"><div className="batch-times"><span></span>{[1,2,3,4,5].map(n=><span key={n}>t{n}</span>)}</div>{requests.map(req=><div className="batch-line" key={req.id}><strong>{req.id}</strong>{[1,2,3,4,5].map(n=><span className={n>=req.start&&n<=req.end?'occupied':''} key={n}>{n>=req.start&&n<=req.end?'●':''}</span>)}</div>)}</div><p>B entra mientras A sigue generando. A termina y deja sitio antes de que C acabe.</p></div>
   </VisualShell>;
 }
 
@@ -104,20 +103,16 @@ function MetricsVisual() {
   </VisualShell>;
 }
 
-const knobs=[
-  {key:'gpu-memory-utilization',effect:'Reserva de memoria',tradeoff:'Más presupuesto para la caché puede dejar menos margen a otras necesidades. Vigila la VRAM observada.'},
-  {key:'max-model-len',effect:'Longitud máxima',tradeoff:'Admitir contextos largos aumenta la demanda potencial de KV cache. Comprueba las longitudes reales.'},
-  {key:'max-num-seqs',effect:'Secuencias simultáneas',tradeoff:'Más secuencias pueden elevar el throughput y también la espera o la presión de memoria.'},
-  {key:'max-num-batched-tokens',effect:'Tokens por lote',tradeoff:'Cambia cuánto trabajo entra en una iteración. Compara cola, TTFT y uso de GPU.'},
-  {key:'Prefix caching',effect:'Prefijos compartidos',tradeoff:'Ayuda cuando varias peticiones repiten un prefijo. Si todo cambia, el beneficio será menor.'},
-  {key:'Chunked prefill',effect:'Prompts largos',tradeoff:'Divide el prefill para intercalarlo con decode. Mide el efecto sobre TTFT e ITL.'},
-  {key:'CUDA graphs',effect:'Lanzamiento de kernels',tradeoff:'Puede reducir overhead, pero ocupa memoria adicional.'},
-  {key:'Cuantización',effect:'Pesos',tradeoff:'Puede liberar memoria. Comprueba calidad, soporte del checkpoint y kernels de tu GPU.'},
-];
 function TuningVisual() {
-  const [selected,setSelected]=useState(0),[baseline,setBaseline]=useState(false);
-  return <VisualShell title="Elige un ajuste y explica el coste" aside="Opciones y valores por defecto cambian con la versión de vLLM, el modelo y el hardware. No hay una configuración universal.">
-    <div className="tuning-layout"><div className="knob-list">{knobs.map((knob,i)=><button key={knob.key} aria-pressed={selected===i} onClick={()=>setSelected(i)}><span>{String(i+1).padStart(2,'0')}</span>{knob.key}</button>)}</div><div className="knob-detail" aria-live="polite"><small>AFECTA A · {knobs[selected].effect.toUpperCase()}</small><h3>{knobs[selected].key}</h3><p>{knobs[selected].tradeoff}</p><label className="baseline-check"><input type="checkbox" checked={baseline} onChange={e=>setBaseline(e.target.checked)}/><span>He guardado la línea base antes de tocarlo</span></label><div className="measure-line">{baseline?'Ahora cambia este ajuste y mide con la misma carga.':'Primero registra versión, carga, TTFT, throughput, errores y VRAM.'}</div></div></div>
+  const groups=[
+    {number:'01',name:'Memoria y contexto',keys:'gpu-memory-utilization · max-model-len · KV cache',text:'Más contexto y caché piden más VRAM. Deja margen.'},
+    {number:'02',name:'Planificador',keys:'max-num-seqs · max-num-batched-tokens · lotes continuos',text:'Más trabajo por iteración puede subir el throughput y la espera.'},
+    {number:'03',name:'Trabajo repetido',keys:'Prefix caching · chunked prefill',text:'Los prefijos compartidos se reutilizan; los prompts largos se trocean.'},
+    {number:'04',name:'Ejecución',keys:'CUDA graphs · cuantización',text:'Menos overhead o pesos menores pueden costar memoria o calidad.'},
+  ];
+  return <VisualShell title="Cuatro palancas, cuatro costes" aside="Ajustes y soporte dependen de la versión de vLLM, el modelo, la GPU y la carga. No existe una configuración universal.">
+    <div className="tuning-overview">{groups.map(group=><article key={group.number}><span>{group.number}</span><h3>{group.name}</h3><small>{group.keys}</small><p>{group.text}</p></article>)}</div>
+    <p className="visual-under">Guarda una línea base. Cambia una o dos cosas y compara TTFT, throughput, errores y VRAM con la misma carga.</p>
   </VisualShell>;
 }
 
@@ -148,26 +143,19 @@ const strategies={
   CP:{name:'Context Parallelism',a:'Contexto / parte A',b:'Contexto / parte B',link:'Atención repartida',text:'Reparte trabajo o estado para contextos largos. Distingue prefill y decode según soporte.'},
 };
 function ParallelVisual() {
-  const [strategy,setStrategy]=useState('TP'),[bottleneck,setBottleneck]=useState('memoria');
-  const hint={memoria:'TP o PP pueden ayudar a repartir un modelo que no cabe. Comprueba comunicación y topología.',peticiones:'DP es una primera hipótesis si cada réplica puede cargar el modelo.',expertos:'EP tiene sentido en MoE si el backend y el hardware lo soportan.',contexto:'CP puede servir para contextos largos, según implementación y fase de inferencia.'};
-  return <VisualShell title="Elige el cuello de botella" aside="NVLink, PCIe y red tienen costes distintos. Ninguna estrategia garantiza aceleración lineal.">
-    <Choice label="Cuello de botella" options={[{value:'memoria',label:'Modelo no cabe'},{value:'peticiones',label:'Cola de peticiones'},{value:'expertos',label:'Expertos MoE'},{value:'contexto',label:'Contexto largo'}]} value={bottleneck} onChange={setBottleneck}/>
-    <p className="parallel-hint">{hint[bottleneck]}</p>
-    <div className="strategy-tabs" role="group" aria-label="Estrategia de paralelismo">{Object.keys(strategies).map(key=><button key={key} aria-pressed={strategy===key} onClick={()=>setStrategy(key)}>{key}</button>)}</div>
-    <div className="gpu-diagram" aria-live="polite"><div><small>GPU 1</small><strong>{strategies[strategy].a}</strong></div><span>{strategies[strategy].link}</span><div><small>GPU 2</small><strong>{strategies[strategy].b}</strong></div></div><div className="strategy-explain"><strong>{strategies[strategy].name}</strong><p>{strategies[strategy].text}</p></div>
+  return <VisualShell title="¿Qué recurso se ha quedado corto?" aside="NVLink, PCIe y red tienen costes distintos. Ninguna estrategia garantiza aceleración lineal.">
+    <div className="parallel-overview">{Object.entries(strategies).map(([key,item])=><article key={key}><div className="parallel-title"><b>{key}</b><strong>{item.name}</strong></div><div className="parallel-pair"><span>{item.a}</span><em>{item.link}</em><span>{item.b}</span></div><p>{item.text}</p></article>)}</div>
   </VisualShell>;
 }
 
 function SizingVisual() {
-  const [precision,setPrecision]=useState('FP16/BF16'),[requests,setRequests]=useState(8),[checks,setChecks]=useState([]);
   const weights={'FP16/BF16':28,'INT8':14,'INT4':7};
   const criteria=['Calidad comprobada','TTFT p95 medido','Errores medidos','Margen de VRAM medido'];
-  const toggle=i=>setChecks(old=>old.includes(i)?old.filter(x=>x!==i):[...old,i]);
-  return <VisualShell title="¿Aceptarías este despliegue?" dark aside="Ejercicio hipotético. Las cifras de pesos son ideales; ninguna variante se ha benchmarkeado aquí.">
+  return <VisualShell title="14B en 24 GB: la cuenta no acaba en los pesos" dark aside="Ejercicio hipotético. Las cifras de pesos son ideales; ninguna variante se ha benchmarkeado aquí.">
     <div className="sizing-intro"><div><small>CHECKPOINT</small><strong>≈14B</strong></div><div><small>TARJETA</small><strong>24 GB</strong></div><div><small>CONTEXTO POR PETICIÓN</small><strong>2.048 + hasta 512</strong></div></div>
-    <div className="visual-controls"><div><span className="control-label">PRECISIÓN A PROBAR</span><Choice label="Precisión del ejercicio" options={Object.keys(weights).map(value=>({value,label:value}))} value={precision} onChange={setPrecision}/></div><div><span className="control-label">SOLICITUDES ACTIVAS</span><Choice label="Concurrencia de prueba" options={[1,4,8].map(value=>({value,label:String(value)}))} value={requests} onChange={setRequests}/></div></div>
-    <div className="sizing-assessment"><div><small>SOLO PESOS · IDEAL</small><strong>≈{weights[precision]} GB</strong><p>{precision==='FP16/BF16'?'Supera 24 GB antes de contar runtime. Esta variante no cabe entera en una sola tarjeta de 24 GB.':'Que los pesos sean menores que 24 GB no demuestra que el despliegue quepa ni cumpla el objetivo.'}</p></div><div><small>PRUEBA PROPUESTA</small><strong>{requests} {requests===1?'petición':'peticiones'}</strong><p>Hipótesis: checkpoint compatible, max-model-len 4096 y gpu-memory-utilization 0.85. Falta medir.</p></div></div>
-    <div className="acceptance"><span className="control-label">CRITERIOS DE ACEPTACIÓN</span><div>{criteria.map((label,i)=><label key={label}><input type="checkbox" checked={checks.includes(i)} onChange={()=>toggle(i)}/>{label}</label>)}</div><p aria-live="polite">{checks.length===criteria.length?'Los cuatro datos están marcados. Contrasta sus valores con el objetivo antes de decidir.':'Decisión pendiente: aún faltan medidas. Objetivo didáctico: TTFT p95 < 2 s y errores < 1 %.'}</p></div>
+    <div className="sizing-weights">{Object.entries(weights).map(([name,value])=><div key={name} className={value>24?'over':''}><small>{name} · SOLO PESOS</small><strong>≈{value} GB</strong><p>{value>24?'Ya supera la tarjeta.':'Podría dejar margen, pero falta medir KV, runtime y buffers.'}</p></div>)}</div>
+    <div className="sizing-hypothesis"><small>HIPÓTESIS INICIAL · SIN BENCHMARK</small><strong>Checkpoint cuantizado compatible · max-model-len 4096 · gpu-memory-utilization 0.85</strong><span>Probar 1 → 4 → 8 solicitudes activas</span></div>
+    <div className="acceptance"><span className="control-label">PARA ACEPTARLA HAY QUE MEDIR</span><div>{criteria.map((label,i)=><span key={label}>{String(i+1).padStart(2,'0')} · {label}</span>)}</div><p>Objetivo didáctico: TTFT p95 &lt; 2 s y errores &lt; 1 %. Ninguna variante está validada todavía.</p></div>
   </VisualShell>;
 }
 
