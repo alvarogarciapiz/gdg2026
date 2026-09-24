@@ -357,7 +357,8 @@ a { color: inherit; }
 .presentation .section-overline { padding-bottom: 0; border: 0; font-size: 10px; }
 .presentation .section-hero { padding: 12px 0 17px; }
 .presentation .section-hero h1 { font-size: clamp(30px,3vw,48px); margin-bottom: 0; }
-.presentation .section-lead, .presentation .hero-idea { display: none; }
+.presentation .section-lead { display: block; max-width: 1040px; margin-top: 8px; font-size: clamp(16px,1.5vw,21px); line-height: 1.3; }
+.presentation .hero-idea { display: none; }
 .presentation .diagram-moment { margin-bottom: 15px; }
 .demo:focus-visible { outline: 3px solid #788bff; outline-offset: 4px; }
 @media (max-width: 760px) {

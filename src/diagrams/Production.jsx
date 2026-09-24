@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Server, ArrowRight } from 'lucide-react';
+import { Server, ArrowRight, Cpu } from 'lucide-react';
 import { Slide } from './Slide';
 
 export function ProductionVisual() {
@@ -21,7 +21,7 @@ const strategies = [
 ];
 export function ParallelVisual() {
   return <Slide label="Qué se reparte entre las GPU" note="Esquemas conceptuales. Comprueba soporte en modelo, backend y versión. NVLink, PCIe y red tienen costes distintos; no se presupone una aceleración lineal.">
-    <div className="parallel-comparison">{strategies.map(([key,title,a,b,arrow,note])=><div className="parallel-comparison-row" key={key}><h2><strong>{key}</strong><span>{title}</span></h2><div className="gpu-partition"><span><small>GPU 1</small>{a}</span><b aria-hidden="true">{arrow}</b><span><small>GPU 2</small>{b}</span></div><p>{note}</p></div>)}</div>
+    <div className="parallel-comparison">{strategies.map(([key,title,a,b,arrow,note])=><div className="parallel-comparison-row" key={key}><h2><strong>{key}</strong><span>{title}</span></h2><div className={`gpu-partition partition-${key.toLowerCase()}`}><span><Cpu aria-hidden="true"/><small>GPU 1</small><b>{a}</b><i aria-hidden="true"><em/><em/><em/><em/></i></span><strong aria-hidden="true">{arrow}</strong><span><Cpu aria-hidden="true"/><small>GPU 2</small><b>{b}</b><i aria-hidden="true"><em/><em/><em/><em/></i></span></div><p>{note}</p></div>)}</div>
   </Slide>;
 }
 

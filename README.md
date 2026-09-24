@@ -22,7 +22,7 @@ El mapa permite acercar, alejar y arrastrar. Las flechas del teclado eligen una 
 
 El público ve las lecciones cerradas hasta que un ponente las abre. El icono de la llave, a la derecha del encabezado, abre el acceso de ponentes. Al entrar en una lección como ponente, esta se abre para todos. El botón **Lecciones** permite abrir o cerrar cada una manualmente; **QR** muestra `gdg.lvrpiz.com` y su código para proyectarlo. Si una lección se cierra mientras alguien la está leyendo, vuelve a mostrarse el candado en la siguiente actualización. La web consulta el estado compartido cada cinco segundos y al volver a la pestaña.
 
-Las once secciones combinan ejemplos, cifras y esquemas para apoyar la explicación oral. No hay reproducción automática al entrar. Solo hay controles donde permiten comparar algo: la KV cache con una u ocho secuencias, las iteraciones de un lote continuo y el fallo de una réplica. Las URL `#/seccion/01` a `#/seccion/11` abren cada sección; las visitas se recuerdan durante la sesión.
+Las once secciones combinan ejemplos, cifras y esquemas para apoyar la explicación oral. La generación, el lote continuo y la llegada de tokens se animan una vez al entrar, con opción de pausa o repetición. Los controles de la KV cache y del fallo de una réplica permiten comparar casos concretos. Las URL `#/seccion/01` a `#/seccion/11` abren cada sección; las visitas se recuerdan durante la sesión.
 
 El contenido se edita en `src/workshopData.js`. `src/Visuals.jsx` selecciona los apoyos visuales de `src/diagrams/`: `Fundamentals.jsx`, `Serving.jsx` y `Production.jsx`. `Slide.jsx` contiene los elementos compartidos y `diagrams.css` sus estilos. Los notebooks aparecen como llamadas a la práctica; este proyecto no los implementa.
 
