@@ -1,12 +1,37 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
+import { Play, Pause, RotateCcw } from 'lucide-react';
 import { Slide, Asset, Choice, number } from './Slide';
 
 export function FlowVisual() {
+  const stages = ['Texto', 'Tokenizer', 'Tokens', 'Modelo', 'Logits', 'Muestreo', 'Tokens nuevos', 'Texto'];
+  const explanations = [
+    'Escribimos una frase incompleta.',
+    'El tokenizer la divide según el vocabulario del modelo.',
+    'El modelo recibe números, no palabras sueltas.',
+    'Calcula qué puede venir después.',
+    'Produce una puntuación para cada posible token.',
+    'El muestreo elige el siguiente token.',
+    'El token elegido se añade a la secuencia.',
+    'Se decodifica y aparece como texto. El ciclo puede repetirse.',
+  ];
+  const reduced = useReducedMotion();
+  const [step, setStep] = useState(-1);
+  const [playing, setPlaying] = useState(false);
+  useEffect(() => {
+    if (!playing || reduced) return;
+    const timer = window.setTimeout(() => {
+      if (step >= stages.length - 1) setPlaying(false);
+      else setStep(value => value + 1);
+    }, 1050);
+    return () => window.clearTimeout(timer);
+  }, [playing, step, reduced]);
+  useEffect(() => { if (reduced) setPlaying(false); }, [reduced]);
   return <Slide label="Un ejemplo de generación" className="inference-support" note="Ejemplo de texto y tokens; no es la salida de un modelo conectado.">
     <div className="sentence-example"><span>La capital de España es</span> <strong>Madrid</strong><span>.</span></div>
-    <p className="support-line">El modelo calcula el siguiente token. Lo añade y vuelve a calcular.</p>
-    <ol className="plain-flow" aria-label="Proceso de inferencia">{['Texto', 'Tokenizer', 'Tokens', 'Modelo', 'Logits', 'Muestreo', 'Tokens nuevos', 'Texto'].map((name, i) => <li key={i}>{name}</li>)}</ol>
+    <div className="flow-heading"><p className="support-line">El modelo elige un token, lo añade y repite.</p>{reduced ? <button className="support-action" onClick={() => setStep(value => (value + 1) % stages.length)}>Siguiente paso</button> : <button className="support-action" onClick={() => { if (step >= stages.length - 1 || step < 0) setStep(0); setPlaying(value => !value); }}>{playing ? <Pause/> : step >= stages.length - 1 ? <RotateCcw/> : <Play/>}{playing ? 'Pausar' : step >= stages.length - 1 ? 'Repetir' : 'Ver pasos'}</button>}</div>
+    <ol className="plain-flow" aria-label="Proceso de inferencia">{stages.map((name, i) => <li key={i} className={step === i ? 'current-step' : ''} aria-current={step === i ? 'step' : undefined}>{name}</li>)}</ol>
+    <p className="flow-explanation" aria-live="polite">{step < 0 ? 'Pulsa «Ver pasos» para seguir el recorrido de la frase.' : explanations[step]}</p>
     <div className="responsibilities"><p><strong>Con una API</strong>El proveedor carga y ejecuta el modelo.</p><p><strong>Con los pesos</strong>Tú eliges el runtime y gestionas la GPU.</p></div>
   </Slide>;
 }
@@ -25,7 +50,7 @@ export function ArchitectureVisual() {
 export function PrecisionVisual() {
   return <Slide label="Memoria ideal de pesos de un modelo 8B" note="Pesos ideales: faltan escalas, metadatos, tensores sin cuantizar y runtime. Menos bits no garantizan más velocidad.">
     <p className="support-kicker">Un modelo de 8B · solo pesos</p>
-    <div className="precision-figures">{[['FP32', '4 B', '32'], ['FP16 / BF16', '2 B', '16'], ['FP8 / INT8', '≈1 B', '8'], ['INT4', '≈0,5 B', '4']].map(([name, bytes, gb]) => <div key={name}><h2>{name}</h2><strong>{gb}<small> GB</small></strong><p>{bytes} por parámetro</p></div>)}</div>
+    <div className="precision-figures">{[['FP32', '4 B', '32'], ['FP16 / BF16', '2 B', '16'], ['FP8 / INT8', '≈1 B', '8'], ['INT4', '≈0,5 B', '4']].map(([name, bytes, gb]) => <div key={name}><h2>{name}</h2><strong>{gb}<small> GB</small></strong><div className="precision-bar" aria-hidden="true"><span style={{width:`${Number(gb)/32*100}%`}}/></div><p>{bytes} por parámetro</p></div>)}</div>
     <div className="format-definitions"><p><strong>GGUF</strong>Formato de archivo</p><p><strong>AWQ / GPTQ</strong>Métodos de cuantización</p><p><strong>FP8</strong>Representación numérica</p></div>
   </Slide>;
 }

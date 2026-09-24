@@ -38,8 +38,28 @@ export function ServingVisual() {
 }
 
 export function MetricsVisual() {
+  const reduced = useReducedMotion();
+  const [phase, setPhase] = useState(-1);
+  const [playing, setPlaying] = useState(false);
+  const explanation = [
+    'La petición ya salió. La persona sigue esperando el primer token.',
+    'Llega el primer token. Aquí termina el TTFT.',
+    'Van llegando más tokens; el intervalo entre ellos es el ITL.',
+    'La respuesta está completa. La latencia total incluye toda la espera.',
+  ];
+  useEffect(() => {
+    if (!playing || reduced) return;
+    const timer = window.setTimeout(() => {
+      if (phase >= 3) setPlaying(false);
+      else setPhase(value => value + 1);
+    }, 1350);
+    return () => window.clearTimeout(timer);
+  }, [playing, phase, reduced]);
+  useEffect(() => { if (reduced) setPlaying(false); }, [reduced]);
   return <Slide label="Cuánto espera quien hace una petición" note="Esquema sin escala temporal. TPOT: tiempo medio por token de salida después del primero, cuando se usa esa definición.">
-    <div className="latency-illustration"><div className="latency-events"><span>Petición</span><span>Primer token</span><span>Último token</span></div><div className="latency-track"><span className="latency-wait"/><span className="latency-token"/><span className="latency-generation">{[0,1,2,3,4].map(i=><i key={i}/>)}</span></div><div className="latency-labels"><strong>TTFT<small>Hasta el primer token</small></strong><strong>ITL<small>Entre tokens</small></strong></div><div className="total-latency">Latencia total</div></div>
+    <div className="batch-heading"><h3>Una respuesta, paso a paso</h3>{reduced ? <button className="support-action" onClick={() => setPhase(value => (value + 1) % 4)}>Siguiente paso</button> : <button className="support-action" onClick={() => { if (phase >= 3 || phase < 0) setPhase(0); setPlaying(value => !value); }}>{playing ? <Pause/> : phase >= 3 ? <RotateCcw/> : <Play/>}{playing ? 'Pausar' : phase >= 3 ? 'Repetir' : 'Ver respuesta'}</button>}</div>
+    <div className="latency-illustration"><div className="latency-events"><span>Petición</span><span>Primer token</span><span>Último token</span></div><div className="latency-track"><span className={'latency-wait '+(phase === 0 ? 'is-active' : '')}/><span className={'latency-token '+(phase === 1 ? 'is-active' : '')}/><span className="latency-generation">{[0,1,2,3,4].map(i=><i key={i} className={phase >= 2 && (phase === 3 || i < 3) ? 'is-active' : ''}/>)}</span></div><div className="latency-labels"><strong className={phase <= 1 && phase >= 0 ? 'is-active' : ''}>TTFT<small>Hasta el primer token</small></strong><strong className={phase === 2 ? 'is-active' : ''}>ITL<small>Entre tokens</small></strong></div><div className={'total-latency '+(phase === 3 ? 'is-active' : '')}>Latencia total</div></div>
+    <p className="batch-explanation" aria-live="polite">{phase < 0 ? 'El primer token y los siguientes no miden lo mismo.' : explanation[phase]}</p>
     <div className="metric-comparison"><p><strong>Una persona</strong>Cuánto espera y cómo llega la respuesta.</p><p><strong>Todo el servicio</strong>Tokens y peticiones completadas por segundo.</p></div>
     <p className="support-line">Atender más peticiones puede aumentar la espera.</p>
   </Slide>;
