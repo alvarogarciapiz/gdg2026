@@ -18,7 +18,7 @@ export function ArchitectureVisual() {
       <div><h2>MoE</h2><div className="decoder-simple"><span>Atención</span><b aria-hidden="true">↓</b><span>Router</span><div className="simple-experts"><b>E1</b><span>E2</span><b>E3</b><span>E4</span></div></div><p>El router elige algunos expertos.</p></div>
     </div>
     <p className="architecture-conclusion">Pesos residentes: <strong>total cargado</strong>.<br/>Cálculo por token: depende también de los <strong>expertos activos</strong>.</p>
-    <div className="context-strip"><span>El contexto es otra cuenta</span><strong>Prompt + respuesta ≤ ventana del modelo</strong></div>
+    <div className="context-strip"><span>El tamaño no fija el contexto</span><strong>Prompt + respuesta ≤ ventana del modelo</strong></div>
   </Slide>;
 }
 

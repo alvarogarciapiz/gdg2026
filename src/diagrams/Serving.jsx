@@ -41,13 +41,13 @@ export function MetricsVisual() {
   return <Slide label="Cuánto espera quien hace una petición" note="Esquema sin escala temporal. TPOT: tiempo medio por token de salida después del primero, cuando se usa esa definición.">
     <div className="latency-illustration"><div className="latency-events"><span>Petición</span><span>Primer token</span><span>Último token</span></div><div className="latency-track"><span className="latency-wait"/><span className="latency-token"/><span className="latency-generation">{[0,1,2,3,4].map(i=><i key={i}/>)}</span></div><div className="latency-labels"><strong>TTFT<small>Hasta el primer token</small></strong><strong>ITL<small>Entre tokens</small></strong></div><div className="total-latency">Latencia total</div></div>
     <div className="metric-comparison"><p><strong>Una persona</strong>Cuánto espera y cómo llega la respuesta.</p><p><strong>Todo el servicio</strong>Tokens y peticiones completadas por segundo.</p></div>
-    <p className="support-line">Más throughput puede traer más cola.</p>
+    <p className="support-line">Atender más peticiones puede aumentar la espera.</p>
   </Slide>;
 }
 
 export function TuningVisual() {
   return <Slide label="Qué ajustar en vLLM" note="Los valores y el soporte dependen de la versión, el modelo, la GPU y las peticiones. No hay una configuración óptima para todos los casos.">
     <div className="tuning-notes"><div><h2>Memoria</h2><p>Limita el contexto y deja margen.</p><code>max-model-len · gpu-memory-utilization</code></div><div><h2>Cola y latencia</h2><p>Ajusta cuántas secuencias y tokens procesa cada iteración.</p><code>max-num-seqs · max-num-batched-tokens</code></div><div><h2>Trabajo repetido</h2><p>Prueba prefix caching si las peticiones comparten prefijo.</p><span>Chunked prefill permite intercalar prompts largos con decode.</span></div></div>
-    <p className="tuning-reminder">Cambia un ajuste. Repite la prueba. Compara.</p>
+    <p className="tuning-reminder">Prueba un cambio cada vez y compáralo con la línea base.</p>
   </Slide>;
 }

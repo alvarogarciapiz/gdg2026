@@ -22,11 +22,11 @@
 .architecture-pair h2 { font-size: 34px; margin-bottom: 22px; }
 .architecture-pair p { font-size: 20px; margin-top: 15px; }
 .decoder-simple { display: flex; flex-direction: column; align-items: center; gap: 8px; min-height: 190px; }
-.decoder-simple > span { padding: 12px; width: min(100%,300px); border: 1px solid #bdc6d7; border-radius: 5px; font-size: 22px; }
+.decoder-simple > span { padding: 12px; width: min(100%,300px); background: #edf1f8; border-radius: 4px; font-size: 22px; }
 .decoder-simple > b { color: #8b96aa; }
 .simple-experts { display: flex; gap: 10px; }
-.simple-experts > * { padding: 10px 20px; border: 1px solid #d8dadf; font-size: 18px; border-radius: 4px; font-weight: 500; }
-.simple-experts b { color: #304b88; background: #e3e8f5; border-color: #aebdd9; }
+.simple-experts > * { padding: 10px 20px; background: #f0f0ed; font-size: 18px; border-radius: 4px; font-weight: 500; }
+.simple-experts b { color: white; background: #3d527e; }
 .architecture-conclusion { font-size: 22px; line-height: 1.6; padding: 22px 0; }
 .context-strip { display: flex; justify-content: space-between; gap: 20px; padding-top: 20px; border-top: 1px solid #d8dadf; font-size: 20px; }
 .context-strip span { color: var(--support-muted); }
@@ -117,12 +117,12 @@
 .failure-example { display: flex; align-items: center; gap: 25px; min-height: 65px; }
 .failure-example p { font-size: 19px; line-height: 1.5; }
 .operations-summary { display: flex; justify-content: space-between; border-top: 1px solid #d8dadf; padding-top: 24px; margin-top: 22px; gap: 20px; font-size: 20px; }
-.parallel-comparison-row { display: grid; grid-template-columns: 170px 1fr 250px; align-items: center; gap: 24px; padding: 15px 0; border-bottom: 1px solid #d8dadf; }
+.parallel-comparison-row { display: grid; grid-template-columns: 150px 1fr 220px; align-items: center; gap: 24px; padding: 17px 0; border-bottom: 1px solid #d8dadf; }
 .parallel-comparison-row h2 strong { display: block; font-size: 29px; font-weight: 550; }
 .parallel-comparison-row h2 span { font-size: 16px; font-weight: 400; letter-spacing: 0; }
 .gpu-partition { display: grid; grid-template-columns: 1fr 20px 1fr; align-items: center; gap: 10px; }
-.gpu-partition > span { padding: 12px; border: 1px solid #bdc6d7; border-radius: 4px; font-size: 16px; }
-.gpu-partition small { display: block; font-size: 11px; color: var(--support-muted); margin-bottom: 7px; }
+.gpu-partition > span { padding: 12px 15px; background: #edf1f8; border-radius: 4px; font-size: 17px; line-height: 1.35; }
+.gpu-partition small { display: block; font-size: 12px; color: #52617d; margin-bottom: 5px; }
 .gpu-partition b { color: #78849c; text-align: center; }
 .parallel-comparison-row p { font-size: 17px; line-height: 1.5; color: var(--support-muted); }
 .sizing-case { display: flex; gap: 80px; margin-bottom: 28px; }
@@ -139,7 +139,7 @@
 .starting-hypothesis strong { display: block; font-weight: 550; }
 .starting-hypothesis code { font-size: 15px; line-height: 1.6; color: #304b88; }
 @media (max-width: 1000px) {
-  .parallel-comparison-row { grid-template-columns: 130px 1fr 190px; gap: 15px; }
+  .parallel-comparison-row { grid-template-columns: 120px 1fr 180px; gap: 15px; }
   .service-chain li { font-size: 20px; gap: 12px; }
   .service-chain { gap: 12px; }
   .precision-figures { gap: 18px; }

@@ -13,11 +13,11 @@ export function ProductionVisual() {
 }
 
 const strategies = [
-  ['TP', 'Operaciones', 'Parte de una capa', 'Parte de esa capa', '↔', 'Comunicación frecuente entre GPU.'],
-  ['PP', 'Capas', 'Primeras capas', 'Siguientes capas', '→', 'Las etapas pueden quedarse esperando.'],
-  ['DP', 'Peticiones', 'Modelo · petición A', 'Modelo · petición B', '∥', 'Cada réplica necesita alojar su modelo.'],
+  ['TP', 'Operaciones', 'Parte de la capa', 'Otra parte', '↔', 'Comunicación frecuente entre GPU.'],
+  ['PP', 'Capas', 'Primeras capas', 'Capas siguientes', '→', 'Las etapas pueden quedarse esperando.'],
+  ['DP', 'Peticiones', 'Modelo · A', 'Modelo · B', '∥', 'Cada réplica aloja el modelo.'],
   ['EP', 'Expertos MoE', 'Expertos 1 y 2', 'Expertos 3 y 4', '↔', 'El router envía tokens a sus expertos.'],
-  ['CP', 'Contexto', 'Parte del contexto', 'Parte del contexto', '↔', 'Prefill y decode dependen del backend.'],
+  ['CP', 'Contexto', 'Parte del contexto', 'Otra parte', '↔', 'Prefill y decode dependen del backend.'],
 ];
 export function ParallelVisual() {
   return <Slide label="Qué se reparte entre las GPU" note="Esquemas conceptuales. Comprueba soporte en modelo, backend y versión. NVLink, PCIe y red tienen costes distintos; no se presupone una aceleración lineal.">
