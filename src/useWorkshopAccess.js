@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 const endpoint = 'https://pygfszldqbjuctlpttyf.supabase.co/functions/v1/workshop';
 const sessionKey = 'gdg2026-presenter-session';
 const browserKey = 'gdg2026-browser-id';
+const localSite = ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
 
 function browserId() {
   try {
@@ -30,9 +31,11 @@ async function request(body) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
   try {
+    // En local no acumulamos los cinco fallos por navegador. El límite por red sigue en Supabase.
+    const clientId = localSite && body?.action === 'login' ? crypto.randomUUID() : browserId();
     const response = await fetch(endpoint, {
       method: body ? 'POST' : 'GET',
-      headers: { 'Content-Type': 'application/json', 'x-workshop-client': browserId(), ...(session() ? { 'x-workshop-session': session() } : {}) },
+      headers: { 'Content-Type': 'application/json', 'x-workshop-client': clientId, ...(session() ? { 'x-workshop-session': session() } : {}) },
       body: body ? JSON.stringify(body) : undefined,
       signal: controller.signal,
       cache: 'no-store',
