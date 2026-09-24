@@ -172,7 +172,7 @@ export default function App() {
 
   let content;
   if (access.status !== 'ready') content = <ConnectionView status={access.status} error={access.error} onRetry={access.refresh}/>;
-  else if (qrMode && presenter) content = <QrView onBack={backFromQr}/>;
+  else if (qrMode && presenter) content = <QrView onBack={backFromQr} reduced={reduced}/>;
   else if (section && !readableSection) content = <LockedView section={section} onMap={showMap}/>;
   else if (section) content = <SectionView section={section} presentation={presentation} onNext={() => move(1)} onMap={showMap} canNext={canNext}/>;
   else content = <MapView onOpen={openSection} completed={visibleCompleted} current={visibleCompleted.at(-1)} reduced={reduced} unlocked={access.unlocked} presenter={presenter} accessStatus={access.status} onRetry={access.refresh}/>;

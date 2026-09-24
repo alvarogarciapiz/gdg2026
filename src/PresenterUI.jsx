@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { LockKeyhole, X, ArrowLeft, ExternalLink } from 'lucide-react';
 import { sections } from './workshopData.js';
+import PixelCameo from './PixelCameo.jsx';
 
 function Modal({ onClose, title, children, className = '' }) {
   const ref = useRef(null);
@@ -61,10 +62,11 @@ export function AdminDialog({ onClose, unlocked, onSetLesson, onLogout }) {
   </Modal>;
 }
 
-export function QrView({ onBack }) {
+export function QrView({ onBack, reduced }) {
   return <main className="qr-page">
     <div className="qr-topline"><span>GDG Valladolid · VallaTech Summit 2026</span><button type="button" onClick={onBack}><ArrowLeft size={19}/> Volver al taller</button></div>
     <div className="qr-content"><p className="qr-eyebrow">Material del taller</p><h1>Inferencia de LLMs<br/>en local</h1><img src="/qr-gdg-lvrpiz.svg" alt="Código QR que lleva a gdg.lvrpiz.com"/><a href="https://gdg.lvrpiz.com" target="_blank" rel="noreferrer">gdg.lvrpiz.com <ExternalLink size={19} aria-hidden="true"/></a></div>
+    <div className="qr-pet-scene"><PixelCameo active reduced={reduced}/></div>
   </main>;
 }
 
