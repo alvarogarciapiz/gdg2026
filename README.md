@@ -26,6 +26,8 @@ Las once secciones combinan ejemplos, cifras y esquemas para apoyar la explicaci
 
 El contenido se edita en `src/workshopData.js`. `src/Visuals.jsx` selecciona los apoyos visuales de `src/diagrams/`: `Fundamentals.jsx`, `Serving.jsx` y `Production.jsx`. `Slide.jsx` contiene los elementos compartidos y `diagrams.css` sus estilos. Los notebooks aparecen como llamadas a la práctica; este proyecto no los implementa.
 
+En el mapa aparece de vez en cuando un pequeño personaje de Álvaro en pixel art. `lvrpiz.png` es el original; la web carga la versión recortada de `public/presenters/alvaro.png` (83 KB). Para preparar la futura ilustración de Eduardo, ejecuta `npm run optimize:presenter -- eduardo.png public/presenters/eduardo.png` y añádela a la lista de `src/PixelCameo.jsx`. Al haber dos personajes, el componente activa su breve interacción. El detalle no aparece con la preferencia de movimiento reducido y nunca tapa los controles del mapa.
+
 En modo presentación, el título y el apoyo visual se ajustan al espacio disponible en escritorio. El botón «Explicación» vuelve a la vista de lectura de esa sección. En móvil, el contenido conserva el desplazamiento vertical. Las flechas y PageUp/PageDown cambian de sección. Escape vuelve al mapa. Los controles funcionan por teclado y en pantallas táctiles. Con movimiento reducido, se eliminan las transiciones y las iteraciones del lote se seleccionan manualmente. El modo presentación solo aparece tras el acceso de ponentes.
 
 ## Desplegar en Vercel
